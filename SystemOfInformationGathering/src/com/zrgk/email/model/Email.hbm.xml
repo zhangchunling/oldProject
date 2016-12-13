@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+                                   "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+ 
+	<class name="com.zrgk.email.model.Email" table="email">
+		 
+		<id name="id" column="id" type= "java.lang.Integer" >
+			 <generator class="increment"></generator>
+		</id>
+
+		 
+   		<property name="send" column="send"  ></property>
+        <property name="title" column="title"  ></property>
+        <property name="receive" column="receive"  ></property>
+        <property name="content" column="content"  ></property>
+        <property name="accessory" column="accessory"  ></property> 
+        <property name="sendTime" column="sendtime"  ></property> 
+		<property name="state" column="state"  ></property> 
+       
+    
+        
+
+	</class>
+</hibernate-mapping>

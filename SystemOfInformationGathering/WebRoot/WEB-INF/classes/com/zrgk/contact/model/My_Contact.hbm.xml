@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<!--hbm后缀名 hbm: hibernate mappiing --> 
+<hibernate-mapping>
+	<!-- name对应的是javabean的包名+类名  table是对应的表名 -->
+    <class name="com.zrgk.contact.model.My_Contact" table="mycontact">
+    	<!-- 1.配置主键  <id name="id" 中值对应的是javaBean的属性-->
+        <id name="cid" type="java.lang.Integer">
+            <column name="cid" /> <!-- column标签里配置的是对应表里的id列 -->
+      		<generator class="increment"/><!-- 查到主键的最大值，然后自增1 -->     		
+      		 		
+        </id>
+        
+        <!-- 2.下面配置其他字段的顺序必须与表里字段的顺序一致 -->
+        <property name="cname" type="java.lang.String" ><!-- 这里是javabean的属性 -->
+            <column name="cname"  /><!-- 这里是表里的字段 -->
+        </property>
+     	<property name="csex" type="java.lang.Integer" ><!-- 这里是javabean的属性 -->
+            <column name="csex" /><!-- 这里是表里的字段 -->
+        </property>
+        <property name="cdate" type="java.lang.String" ><!-- 这里是javabean的属性 -->
+            <column name="cdate"  /><!-- 这里是表里的字段 -->
+        </property>
+        <property name="cphone" type="java.lang.String" ><!-- 这里是javabean的属性 -->
+            <column name="cphone"   /><!-- 这里是表里的字段 -->
+        </property>
+        <property name="caddress" type="java.lang.String" ><!-- 这里是javabean的属性 -->
+            <column name="caddress"  /><!-- 这里是表里的字段 -->
+        </property>
+        <property name="cemail" type="java.lang.String" ><!-- 这里是javabean的属性 -->
+            <column name="cemail"  /><!-- 这里是表里的字段 -->
+        </property>
+     
+     </class>  
+           
+</hibernate-mapping>

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans 
+       http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.springframework.org/schema/tx
+       http://www.springframework.org/schema/tx/spring-tx-2.0.xsd
+       http://www.springframework.org/schema/aop 
+       http://www.springframework.org/schema/aop/spring-aop-2.0.xsd">
+<!-- 	
+	1.事物管理器:spring不需要
+	<bean  id="tm" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+	   name值中的 dataSource不能写错，对应的是jar包类里的相应字符	   
+	    <property name="dataSource" ref="dataSource"></property>
+	    ref值中的dataSource是对应的上面配置数据库连接的id值
+	</bean>
+	
+	事物代理通知
+ 	<tx:advice id="tmAdvice" transaction-manager="txManager">
+	   <tx:attributes>
+	   		tx:method 配置哪些方法用事务来管    name="*" 代表对所有的方法设置事务
+	   		name="save*" 代表只对save开头的方法用事务管理 	   		
+	       <tx:method name="*" propagation="REQUIRED"/>支持当前事务，如果当前没有事务，就新建一个事务
+	   </tx:attributes>
+	</tx:advice>  	
+	
+	事物管理范围
+	 <aop:config>
+	   <aop:pointcut id="point" expression="execution(* com.zrgk.permission.service.*.*(..))"/>
+	   <aop:advisor advice-ref="tmAdvice" pointcut-ref="point"/>
+	</aop:config>
+	 -->
+	<!-- 2.注入 dao -->
+	<bean id="employeeDao" class="com.zrgk.permission.dao.impl.EmployeeDaoImpl"><!-- id是别名，class是实现类路径 -->
+	    <!-- 把 hibernate里的sessionFactory工厂注入到相应的具体dao里去  -->
+		<property name="sessionFactory" ref="sessionFactory"></property><!-- name值不能写错，ref是前面注入session工厂的id值 -->
+	</bean>
+	<bean id="roleDao" class="com.zrgk.permission.dao.impl.RoleDaoImpl">
+		<property name="sessionFactory" ref="sessionFactory"></property>
+	</bean>
+	<bean id="menuDao" class="com.zrgk.permission.dao.impl.MenuDaoImpl">
+		<property name="sessionFactory" ref="sessionFactory"></property>
+	</bean>
+	
+	<!-- 7.注入service -->
+	<bean id="employeeService" class="com.zrgk.permission.service.impl.EmployeeServiceImpl"><!-- id是别名，class是实现类路径 -->
+		<property name="employeeDao" ref="employeeDao"></property><!-- name值对应的是service层属性，ref值是注入dao的别名 -->
+	</bean>	
+
+	<bean id="roleService" class="com.zrgk.permission.service.impl.RoleServiceImpl">
+		<property name="roleDao" ref="roleDao"></property>
+	</bean>
+	<bean id="menuService" class="com.zrgk.permission.service.impl.MenuServiceImpl">
+		<property name="menuDao" ref="menuDao"></property>
+	</bean>
+
+	
+	<!-- 8.注入action -->
+	<bean id="employeeAction" class="com.zrgk.permission.action.EmployeeAction">
+		<property name="employeeService" ref="employeeService"></property><!-- name值是对应action层的属性，ref值是注入service时起的别名 -->
+		
+	</bean>
+	<bean id="roleAction" class="com.zrgk.permission.action.RoleAction">
+		<property name="roleService" ref="roleService"></property>
+	</bean>
+	<bean id="loginAction" class="com.zrgk.permission.action.LoginAction">
+		<property name="employeeService" ref="employeeService"></property>
+	</bean>
+	<bean id="menuAction" class="com.zrgk.permission.action.MenuAction">
+		<property name="menuService" ref="menuService"></property>
+	</bean> 
+</beans>

@@ -1,0 +1,42 @@
+package com.zrgk.email.dao;
+
+import java.util.List;
+
+import com.zrgk.email.model.Email;
+import com.zrgk.email.model.Receive;
+import com.zrgk.permission.model.Employee;
+import com.zrgk.utils.Page;
+
+public interface EmailDao {
+
+	void save(Email e);
+
+	List<Employee> queryAllEmp();
+
+	Email getEmailId(Email email);
+
+	void addReceive(Receive r);
+
+ 
+	void deleteById(Integer id);
+
+	Email queryById(Integer id);
+
+	int totalSize(String send);
+
+	List getGiveemail( Page p,Email e);
+
+	List<Email> ExportQueryAll(String send);
+
+	List<Email> QueryBySend(Email e,Page p);
+
+	int totalSize2(String send);
+
+	void upState(Email e);
+
+	 
+
+	
+	
+	
+}

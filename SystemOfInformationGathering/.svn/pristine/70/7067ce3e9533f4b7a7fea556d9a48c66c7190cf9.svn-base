@@ -1,0 +1,85 @@
+	
+	//1.校验资源名称
+   function checkMenuName(){
+   		var username=document.getElementById("menu.menuName").value;
+   		if(""==username.trim()){
+   			var a=document.getElementById("menuNameSpan");
+   			a.innerHTML="资源名称不能为空";
+   			a.className="red";
+   		}else if(username.length>10){
+   			var str=username.substring(0,10);
+			document.getElementById("menu.menuName").value=str;
+			var b=document.getElementById("menuNameSpan");
+			b.innerHTML="资源名称要小于10个字符，已自动截取了前10位";
+			b.className="yellow";			
+   		}else{
+   			var e=document.getElementById("menuNameSpan");
+   			e.innerHTML="OK(^_^)";
+   			e.className="green";
+   		}   		
+   }  
+   //2.校验资源编号
+   function checkMenuNum() {
+	   var username=document.getElementById("menu.menuNum").value;
+	   var a=document.getElementById("menuNumSpan");
+	   if(isNaN(username)){
+		   document.getElementById("menu.menuNum").value="";
+		   a.innerHTML="请输入数字";
+		   a.className="red";
+	   }else{
+		   a.innerHTML="OK(^_^)";
+		   a.className="green";
+	   }
+   }
+  
+   //3.检验资源路径URL
+   function checkMenuUrl(){
+   		var username=document.getElementById("menu.url").value;
+   		var a=document.getElementById("menuUrlSpan");
+   		if(""==username.trim()){   			
+   			a.innerHTML="路径不能为空";
+   			a.className="red";
+   		}else if(username.length>50){   			
+   			var str=username.substring(0,50);
+			document.getElementById("menu.url").value=str;
+			a.innerHTML="要小于50个字符，已自动截取前50位";
+			a.className="yellow";
+   		}else{
+   			a.innerHTML="OK (^_^)";
+   			a.className="green";
+   		}
+   }
+
+   
+   
+    //校验提交
+    function checkSubmit() {  
+    	var username=document.getElementById("menu.menuName").value;
+   		if(""==username.trim()){
+   			var a=document.getElementById("menuNameSpan");
+   			a.innerHTML="资源名称不能为空";
+   			a.className="red";
+   			return false;
+   		}    
+ 	    
+ 	  if(isNaN(document.getElementById("menu.menuNum").value)){
+ 	    	var b=document.getElementById("menuNumSpan");
+ 		   document.getElementById("menu.menuNum").value="";
+ 		   b.innerHTML="请输入数字";
+ 		   b.className="red";
+ 		  return false;
+ 	    }
+
+ 	   var url=document.getElementById("menu.url").value;
+  		var c=document.getElementById("menuUrlSpan");
+  		if(""==url.trim()){   			
+  			c.innerHTML="路径不能为空";
+  			c.className="red";
+  			return false;
+  		}else{
+  			alert("添加成功！");
+			document.getElementById("formId").submit();
+  		}
+   		
+	}
+    

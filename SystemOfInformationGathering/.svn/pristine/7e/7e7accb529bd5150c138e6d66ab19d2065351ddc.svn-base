@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<!--hbm后缀名 hbm: hibernate mappiing --> 
+<hibernate-mapping>
+	<!-- name对应的是javabean的包名+类名  table是对应的表名 -->
+    <class name="com.zrgk.permission.model.Role" table="role">
+    	<!-- 1.配置主键  <id name="id" 中值对应的是javaBean的属性-->
+        <id name="rid" type="java.lang.Integer">
+            <column name="rid" /> <!-- column标签里配置的是对应表里的id列 -->
+      		<generator class="increment"/><!-- 查到主键的最大值，然后自增1 -->     		
+      		<!-- a.identity: 自增长类型的主键处理 一般用在mysql数据库中,前提是主键列设成自动增长 -->
+      		<!-- b.assigned: 指定，即手动加入 -->
+      		<!-- c.native: 根据使用的数据库自行判断采用identity、hilo、sequence其中一种作为主键生成方式，灵活性很强 -->  
+      		<!-- d.sequence:使用oracle的序列处理主键 ,新增时会从oracle的指定序列里拿下一个值 ，但得多配个序列名-->
+	      		<!-- <generator class="sequence">
+	      			<param name="sequence">seq_student_id</param>
+	      		</generator>  -->   		
+        </id>
+        
+        <!-- 2.下面配置其他字段的顺序必须与表里字段的顺序一致 -->
+        <property name="roleName" type="java.lang.String" ><!-- 这里是javabean的属性 -->
+            <column name="roleName"  /><!-- 这里是表里的字段 -->
+        </property>
+     	<property name="r_state" type="java.lang.Integer" ><!-- 这里是javabean的属性 -->
+            <column name="r_state" /><!-- 这里是表里的字段 -->
+        </property>
+        <property name="strRole" type="java.lang.String" ><!-- 这里是javabean的属性 -->
+            <column name="strRole" /><!-- 这里是表里的字段 -->
+        </property>
+     </class>  
+           
+</hibernate-mapping>

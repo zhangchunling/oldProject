@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC "-//Apache Software Foundation//DTD Struts Configuration 2.1.7//EN" "struts-2.1.7.dtd" >
+<struts>
+		<!-- struts  默认的后缀 action   可配置的   -->
+ 	<!--  <constant name="struts.action.extension" value="action"/> -->
+    <!-- 配置开发模式 ：  错误信息会更详细     当我们修改struts 的配置 当前的应用程序就会自动加载一遍 -->
+    <constant name="struts.devMode" value="true"/>
+    <!-- 上传文件的 临时保存目录 -->
+	<!-- constant name="struts.multipart.saveDir" value="d:/"></constant> -->
+	<!-- 配置一个全局上传文件的最大值 不能超过这个值 -->
+    <!-- <constant name="struts.multipart.maxSize" value="639326824"></constant> -->
+    
+    
+    <package name="jhn" namespace="/" extends="struts-default">
+    	<!-- 采用通配符原理配置 struts转向   class="{1}Action" 中的{1}Action指的是引用 spring注入的action与的id值 -->
+    	<action name="*_*" class="{1}Action" method="{2}">
+    		<!-- ${resultpath} 取的是action方法里向resultpath属性赋的值  -->
+    		<!-- 跳转到页面 -->
+    		<result name="gojsp" type="dispatcher">${resultpath}</result>
+    		<!-- 带值跳转到action -->
+    		<result name="goaction" type="chain">${resultpath}</result>
+    		<!-- 不带值跳转action -->
+    		<result name="go_redirect_action" type="redirectAction">${resultpath}</result>
+    	</action>
+    	
+    </package>
+</struts>

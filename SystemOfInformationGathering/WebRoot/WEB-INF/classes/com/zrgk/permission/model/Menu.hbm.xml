@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<!--hbm后缀名 hbm: hibernate mappiing --> 
+<hibernate-mapping>
+	<!-- name对应的是javabean的包名+类名  table是对应的表名 -->
+    <class name="com.zrgk.permission.model.Menu" table="menu">
+        <id name="mid" type="java.lang.Integer">
+            <column name="mid" /> <!-- column标签里配置的是对应表里的id列 -->
+      		<generator class="increment"/>		
+        </id>
+        
+        <!-- 2.下面配置其他字段的顺序必须与表里字段的顺序一致 -->
+        <property name="menuNum" type="java.lang.String" ><!-- 这里是javabean的属性 -->
+            <column name="menuNum"  /><!-- 这里是表里的字段 -->
+        </property>
+        <property name="menuName" type="java.lang.String" >
+            <column name="menuName"  />
+        </property>
+        <property name="url" type="java.lang.String" >
+            <column name="url"  />
+        </property>
+        <property name="parentId" type="java.lang.Integer" >
+            <column name="parentId"  />
+        </property>
+        <property name="parentMenu" type="java.lang.String" >
+            <column name="parentMenu"  />
+        </property>
+     	<property name="m_state" type="java.lang.Integer" ><!-- 这里是javabean的属性 -->
+            <column name="m_state" /><!-- 这里是表里的字段 -->
+        </property>
+        
+     </class>  
+           
+</hibernate-mapping>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<!--hbm后缀名 hbm: hibernate mappiing --> 
+<hibernate-mapping>
+	
+    <class name="com.zrgk.permission.model.Emp_role" table="emp_role">
+        <!-- 设主键 -->
+        <id name="eid" type="java.lang.Integer">
+            <column name="eid" />
+      		<generator class="assigned"/>         		 		
+        </id>
+        
+        <property name="rid" type="java.lang.Integer" ><!-- 这里是javabean的属性 -->
+            <column name="rid"  /><!-- 这是表的字段 -->
+        </property>     	
+        
+     </class>  
+           
+</hibernate-mapping>

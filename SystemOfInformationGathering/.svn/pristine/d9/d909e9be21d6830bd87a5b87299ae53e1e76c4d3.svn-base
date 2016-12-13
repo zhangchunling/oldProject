@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC "-//Apache Software Foundation//DTD Struts Configuration 2.1.7//EN" "struts-2.1.7.dtd" >
+<struts>
+	<!-- 修改后缀：使struts默认的后缀 为.action -->
+	<!-- <constant name="struts.action.extension" value="action"/> -->
+    <!-- 配置开发模式 ：  错误信息会更详细     当我们修改struts 的配置 时，当前的应用程序就会自动加载一遍，所以不用重启就生效 -->
+    <!-- <constant name="struts.devMode" value="true"/> -->
+    <!-- 上传文件的 临时保存目录 -->
+	<constant name="struts.multipart.saveDir" value="d:/"></constant>
+	<!-- 配置一个全局上传文件的最大值：单位：字节 -->
+    <constant name="struts.multipart.maxSize" value="639326824"></constant>
+    
+    
+    <package name="employeePackage" namespace="/employeePackage" extends="struts-default">
+    	<!-- 采用通配符原理配置 struts转向 ,{1}Action指的是引用 spring注入的action的id值 -->
+    	<action name="*_*" class="{1}Action" method="{2}">    		
+    		<!-- 跳转到页面 -->
+    		<result name="gotojsp" type="dispatcher">${resultpath}</result><!-- ${resultpath} 取的是action方法里向resultpath属性赋的值  -->
+    		<!-- 跳转到action -->
+    		<result name="gotoaction" type="chain">${resultpath}</result>
+    		
+    		<result name="gotoactionredirect" type="redirect">${resultpath}</result>
+    		<result name="gotoRoleIndex" type="chain">role_queryRoles</result>
+    		<result name="gotoMenu" type="chain">menu_editRoleQuery</result>
+    		
+    	</action>
+    	
+    </package>
+</struts>

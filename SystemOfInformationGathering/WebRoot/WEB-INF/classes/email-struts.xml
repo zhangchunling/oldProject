@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC "-//Apache Software Foundation//DTD Struts Configuration 2.1.7//EN" "struts-2.1.7.dtd" >
+<struts>
+	<!-- 修改后缀：使struts默认的后缀 为.action -->
+	 <!--  <constant name="struts.action.extension" value="action"/>   -->
+	<!-- 配置开发模式 ： 错误信息会更详细 当我们修改struts 的配置 时，当前的应用程序就会自动加载一遍，所以不用重启就生效 -->
+	<!-- <constant name="struts.devMode" value="true" /> -->
+	<!-- 上传文件的 临时保存目录 -->
+	<!-- <constant name="struts.multipart.saveDir" value="d:/"></constant> -->
+	<!-- 配置一个全局上传文件的最大值：单位：字节 -->
+	<constant name="struts.multipart.maxSize" value="639326824000"></constant>
+	<!-- =======================配置action页面===================================== -->
+
+	<package name="mypackage" namespace="/mypackage" extends="struts-default">
+		<!-- 采用通配符原理配置 struts转向 ： class="{1}Action" 中的{1}Action指的是引用 spring注入的action与的id值 -->
+		<action name="*_*" class="{1}Action" method="{2}">
+			<!--上传文件用到的属性 -->
+			<interceptor-ref name="fileUpload">
+				<!-- 设置上传的文件大小问题 单位：字节 -->
+				<!-- <param name="maximumSize">2000000000</param> -->
+			</interceptor-ref>
+			<interceptor-ref name="defaultStack" />
+			<!--跳转到jsp页面的路径 -->
+			<result name="gotojsp" type="dispatcher">${resultpath}</result>
+			<!--跳转到action后台控制层的路径 -->
+			<result name="gotoaction" type="chain">${resultpath}</result>
+			 
+		</action>
+		
+		 <action name="DownloadAction" class="com.zrgk.email.action.DownloadAction">
+           <result type="stream">
+               <param name="contentDisposition">attachment;filename=${filename}</param>
+               <param name="inputName">downloadFile</param>
+           </result>
+           
+           
+       </action>
+		
+		
+		
+	</package>
+</struts>

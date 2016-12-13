@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans 
+       http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.springframework.org/schema/tx
+       http://www.springframework.org/schema/tx/spring-tx-2.0.xsd
+       http://www.springframework.org/schema/aop 
+       http://www.springframework.org/schema/aop/spring-aop-2.0.xsd">
+
+	
+		<!-- 注入 DAO -->
+	<bean id="myMuDao" class="com.zrgk.manu.dao.impl.MyManuDaoImpl">
+	  <!--   把 hibernate里的sessionFactory工厂注入到相应的具体dao里去  -->
+		<property name="sessionFactory" ref="sessionFactory"></property>
+	</bean>
+	
+	<bean id="pfDao" class="com.zrgk.manu.dao.impl.PageFileDaoImpl">
+	    <!-- 把 hibernate里的sessionFactory工厂注入到相应的具体dao里去  -->
+		<property name="sessionFactory" ref="sessionFactory"></property>
+	</bean>
+	
+	<!-- service -->
+	<bean id="myMuService" class="com.zrgk.manu.service.impl.MyManuServiceImpl">
+		<property name="myMuDao" ref="myMuDao"></property>
+	</bean>
+	<bean id="pfService" class="com.zrgk.manu.service.impl.PageFileServiceImpl">
+		<property name="pfdao" ref="pfDao"></property>
+		<property name="mudao" ref="myMuDao"></property>
+	</bean>
+
+	<!-- action -->
+	
+	<bean id="MyManuAction" class="com.zrgk.manu.action.MyManuAction" scope="prototype">
+		<property name="myMuService" ref="myMuService"></property>
+		<property name="pfService" ref="pfService"></property>
+	</bean>
+	
+	<bean id="PageFileAction" class="com.zrgk.manu.action.PageFileAction" >
+		<property name="pfService" ref="pfService"></property>
+		<property name="mmservice" ref="myMuService"></property>
+	</bean>
+	<bean id="ManuAction" class="com.zrgk.manu.action.ManuAction" scope="prototype" >
+		<property name="myMuService" ref="myMuService"></property>
+		<property name="pfService" ref="pfService"></property>
+	</bean>
+</beans>

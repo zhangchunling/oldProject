@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="2.5" 
+	xmlns="http://java.sun.com/xml/ns/javaee" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee 
+	http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+	
+	<!-- 加载spring  beans.xml --> 
+	<context-param>
+		<!-- 加载spring容器 一个常量字符串代表 单词不能写错 -->
+	   <param-name>contextConfigLocation</param-name>
+	   <param-value>/WEB-INF/classes/beans.xml</param-value>
+	</context-param>
+	
+	<!-- spring 的监听器    监听有没有  一个 action的请求 如果有spring 容器就提供一个 action对象  -->
+    <listener>
+		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+	</listener>
+		 
+		 
+    <!-- 4.验证码的servlet -->
+ 	  <servlet>
+	  <servlet-name>getKeyServlet</servlet-name>
+	  <servlet-class>com.zrgk.utils.GetKey</servlet-class>
+	  </servlet>
+	  <servlet-mapping>
+	  <servlet-name>getKeyServlet</servlet-name>
+	  <url-pattern>/getKey</url-pattern>
+	  </servlet-mapping>
+	  
+	  <!-- 配置登录的filter -->
+	 <!-- 必须放在struts核心过滤器的前面，因为要先走登录的，不然实现不了登录过滤 -->
+	<!-- <filter>
+	  	<filter-name>sessionFilter</filter-name>	
+	 	<filter-class>com.zrgk.utils.MyFilter</filter-class>	
+	 </filter> 
+	 <filter-mapping>
+	 	<filter-name>sessionFilter</filter-name>	
+	 	<url-pattern>*.action</url-pattern> 		
+	 </filter-mapping> -->
+  
+	<!-- struts 核心控制器 -->
+	<filter>
+	   <filter-name>struts2</filter-name>
+	   <filter-class>org.apache.struts2.dispatcher.ng.filter.StrutsPrepareAndExecuteFilter</filter-class>
+	</filter>
+    <filter-mapping>
+        <filter-name>struts2</filter-name>
+        <url-pattern>*.action</url-pattern>
+    </filter-mapping>
+   
+    
+	 
+  
+ 	
+  <!-- 主页 -->
+    <welcome-file-list>
+    	<welcome-file>index.jsp</welcome-file>
+  	</welcome-file-list>
+  	
+  	<!-- 错误页面的转向 -->
+  	
+</web-app>

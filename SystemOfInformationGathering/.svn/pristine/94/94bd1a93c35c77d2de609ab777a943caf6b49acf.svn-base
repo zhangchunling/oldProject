@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans 
+       http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://www.springframework.org/schema/tx
+       http://www.springframework.org/schema/tx/spring-tx-2.0.xsd
+       http://www.springframework.org/schema/aop 
+       http://www.springframework.org/schema/aop/spring-aop-2.0.xsd">
+	
+       
+  <!--=================================================================  -->     
+	<import resource="email-beans.xml" />
+	<import resource="pemission-beans.xml"/>
+	<!-- 2.配置管理hibernate的sessionFactory工厂 -->
+	<!-- id值是起的别名 -->
+	<bean id="sessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+		<!-- 2.1把数据库加载到hibernate里去 -->	
+		<property name="dataSource"><!-- name不能写错 对应是jar包里面的东西 -->
+			<ref bean="dataSource" /><!-- bean引用的是上面配置连接信息的id的值  -->
+		</property>
+		
+		<!-- 2.2hibernate的一些其它属性配置信息 -->
+		<property name="hibernateProperties">
+			<props>
+				<!-- 展示sql -->
+				<prop key="hibernate.show_sql">true</prop>
+				<!-- 设置hibernate自动提交数据到数据库 -->
+				<prop key="hibernate.connection.autocommit">true</prop>
+			</props>
+		</property>
+		
+		<!-- 2.3加载所有的hibernate映射文件 -->
+		<property name="mappingResources">
+			<list>
+				<!-- 王缝华 -->
+				<value>com/zrgk/email/model/Email.hbm.xml</value>
+				<value>com/zrgk/email/model/Receive.hbm.xml</value>
+				
+				<!-- 张春林 --> 
+				<value>com/zrgk/permission/model/Employee.hbm.xml</value><!-- 映射文件路径 -->
+				<value>com/zrgk/permission/model/Role.hbm.xml</value>
+				<value>com/zrgk/permission/model/Emp_role.hbm.xml</value>
+				<value>com/zrgk/permission/model/Menu.hbm.xml</value>
+				<value>com/zrgk/permission/model/Role_menu.hbm.xml</value>
+			</list>
+		</property>
+	</bean>
+	 <!-- 3.使用c3p0数据库连接池 -->
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
+	   <property name="driverClass" value="oracle.jdbc.driver.OracleDriver" />
+	   <property name="jdbcUrl" value="jdbc:oracle:thin:@localhost:1521:orcl" />
+	   <property name="user" value="peter" />
+	   <property name="password" value="manager" />
+	   
+	   <property name="minPoolSize" value="10" /><!--连接池的最小连接数 -->
+	   <property name="maxPoolSize" value="100"/>  <!--连接池的最大连接数 -->
+	   <property name="initialPoolSize" value="10"/><!--初始化连接数 -->
+	   <property name="maxIdleTime" value="30"/><!--连接的最大空闲时间，超时的连接将被丢弃，单位：秒 -->
+	   <property name="checkoutTimeout" value="3000"/><!--没有连接可用时，等待连接的时间，单位：毫秒 -->
+   	      	   
+   	   <property name="acquireIncrement" value="5"/>
+	   <property name="acquireRetryAttempts" value="30"/>
+	   <property name="acquireRetryDelay" value="1000"/>
+	   <property name="testConnectionOnCheckin" value="true"/>
+	   <property name="automaticTestTable" value="c3p0_test"/>
+	   <property name="idleConnectionTestPeriod" value="18000"/>
+		<!-- 【还有其他很多属性，详细见文档：C3P0的详细配置说明 】-->
+	 </bean>
+	 
+	 
+	 <!-- 4.在spring2 中配置事务 -->
+	<bean id="txManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory"/><!-- name值是上一句引用类的属性名，ref是前面session工厂的别名 -->
+	</bean>
+</beans>
+	
+	
+	
+	
+	
+	
+	
+	
+ 

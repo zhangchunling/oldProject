@@ -1,0 +1,155 @@
+package com.zrgk.permission.dao.impl;
+
+import java.util.List;
+
+import org.hibernate.Criteria;
+import org.hibernate.Query;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
+import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
+
+import com.zrgk.permission.dao.RoleDaoInter;
+import com.zrgk.permission.model.Role;
+import com.zrgk.permission.model.Role_menu;
+
+
+
+public class RoleDaoImpl extends HibernateDaoSupport  implements RoleDaoInter{
+
+	//在人员管理时查角色
+	@Override
+	public List<Role> queryAllRole() {
+		Session session=this.getSession();
+		Query query=session.createQuery("from Role where r_state=1 ");		
+		List<Role> list=query.list();//按id升序
+		session.close();
+		return list;
+	}
+
+	//在角色管理时查询所有角色
+	@Override
+	public List<Role> queryRoles(Role role) {
+		Session session=this.getSession(true);//得到session
+		Criteria cri=session.createCriteria(Role.class);//创建条件查询		
+		//模糊查询
+		if(role!=null&&role.getRoleName()!=null&&!"".equals(role.getRoleName())){
+			cri.add(Restrictions.ilike("roleName", "%"+role.getRoleName()+"%"));
+		}	
+		//按Id倒序排
+		cri.addOrder(Order.desc("rid"));
+		//分页，从第几条数据开始取
+		cri.setFirstResult((role.getCurrentPage()-1)*5);
+		cri.setMaxResults(5);
+		//执行
+		List<Role> list=cri.list();	
+		session.close();
+		return list;
+	}
+	
+	//插入角色
+	@Override
+	public void insertRole(Role role) {
+		Session session=this.getSession();
+		Transaction tx=session.beginTransaction();
+		session.save(role);		
+		tx.commit();
+		session.close();
+	}
+	
+	//得到最大的角色id，用于插入中间表
+	@Override
+	public int getMaxId() {
+		Session session=this.getSession();
+		Criteria cri=session.createCriteria(Role.class);
+		cri.setProjection(Projections.max("rid"));
+		List list=cri.list();
+		int maxId=(int) list.get(0);
+		session.close();
+		return maxId;
+	}
+	
+	//插入角色-菜单中间表
+	@Override
+	public void insertRole_menu(Role_menu rm) {
+		Session session=this.getSession();
+		Transaction ts=session.beginTransaction();
+		session.save(rm);
+		ts.commit();
+		session.close();		
+	}
+	
+	//根据id查询角色
+	@Override
+	public Role queryRoleById(int id) {
+		Session session=this.getSession();
+		String hql="from Role where rid=?";
+		Query query=session.createQuery(hql);
+		query.setInteger(0, id);
+		List<Role> list=query.list();
+		Role role=list.get(0);
+		session.close();
+		return role;
+	}
+
+	//更新角色
+	@Override
+	public void updateRole(Role role) {
+		Session session=this.getSession();
+		Transaction ts = session.beginTransaction();		
+		session.saveOrUpdate(role);//为什么直接用Update方法不行呢
+		ts.commit();
+		session.close();
+		
+	}
+	
+	//根据id删除角色
+	@Override
+	public void delelteRoleById(int rid) {
+		Session session=this.getSession();
+		Transaction ts=session.beginTransaction();
+		Role role=new Role();
+		role.setRid(rid);
+		session.delete(role);
+		ts.commit();
+		session.close();
+		
+	}
+	
+	//删除中间表
+	@Override
+	public void deleteRole_menu(int rmid) {
+		Session session=this.getSession();
+		Transaction ts=session.beginTransaction();
+		
+		String hql="delete Role_menu where rid=? ";		
+		Query query = session.createQuery(hql);
+		query.setInteger(0, rmid);//绑定问号
+		query.executeUpdate();
+		ts.commit();
+		session.close();		
+	}
+
+	//查询总的数据条数
+	@Override
+	public int totalSize(Role role) {
+		Session session=this.getSession(true);//得到session
+		Criteria cri=session.createCriteria(Role.class);//创建条件查询
+		
+		//模糊查询:【查询条件一定要和查询人员显示到页面的方法的查询条件一致，这样的分页才是想要数据的分页】
+		if(role!=null&&role.getRoleName()!=null&&!"".equals(role.getRoleName())){
+			cri.add(Restrictions.ilike("roleName", "%"+role.getRoleName()+"%"));
+		}
+		//统计总条数
+		cri.setProjection(Projections.rowCount());
+		//执行
+		List list=cri.list();	
+		int nums=(int) list.get(0);
+		session.close();
+		return nums;
+	}
+
+
+}

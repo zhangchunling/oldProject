@@ -1,0 +1,101 @@
+	
+	//1.校验资源名称
+   function checkMenuName(){
+   		var username=document.getElementById("menu.menuName").value;
+   		var a=document.getElementById("menuNameSpan");
+   		if(""==username.trim()){   			
+   			a.innerHTML="资源名称不能为空";
+   			a.className="red";
+   		}else if(username.length>10){
+   			var str=username.substring(0,10);
+			document.getElementById("menu.menuName").value=str;
+			a.innerHTML="资源名称要小于10个字符，已自动截取了前10位";
+			a.className="yellow";			
+   		}else{
+   			var today = new Date();   		 
+  			 $.ajax({   //后面跟一个时间的参数是为了防止有时候不提交的问题【冲破缓存，也可跟个随机数】	
+  				 url:"employeePackage/menu_checkEditMenuAjax.action?time="+today.getTime(),//访问路径
+  				 type:"post",//提交方式
+  				 data:"menuname="+username, //username是action类里的属性
+  				 success:function(data){//回调函数：返回的是json串,out.print("")里的字符串
+  					 
+  						if("1"==data){   						 
+  	   						a.innerHTML="已存在,请重新输入";
+  	   						a.className="red";  
+  	   						document.getElementById("menu.menuName").value="";
+  	   					 }else{
+  	   						a.innerHTML="OK(^_^)";
+  	   						a.className="green";
+  	   					 }
+  					 
+  					 
+  				   // username = data.employee.empName;//得到actoin类里的属性值    			     
+  				  }
+  			 });
+   		}   		
+   }  
+   //2.校验资源编号
+   function checkMenuNum() {
+	   var username=document.getElementById("menu.menuNum").value;
+	   var a=document.getElementById("menuNumSpan");
+	   if(isNaN(username)){
+		   document.getElementById("menu.menuNum").value="";
+		   a.innerHTML="请输入数字";
+		   a.className="red";
+	   }else{
+		   a.innerHTML="OK(^_^)";
+		   a.className="green";
+	   }
+   }
+  
+   //3.检验资源路径URL
+   function checkMenuUrl(){
+   		var username=document.getElementById("menu.url").value;
+   		var a=document.getElementById("menuUrlSpan");
+   		if(""==username.trim()){   			
+   			a.innerHTML="路径不能为空";
+   			a.className="red";
+   		}else if(username.length>50){   			
+   			var str=username.substring(0,50);
+			document.getElementById("menu.url").value=str;
+			a.innerHTML="要小于50个字符，已自动截取前50位";
+			a.className="yellow";
+   		}else{
+   			a.innerHTML="OK (^_^)";
+   			a.className="green";
+   		}
+   }
+
+  
+   
+    //校验提交
+    function checkSubmit() {   
+    	var username=document.getElementById("menu.menuName").value;
+   		if(""==username.trim()){
+   			var a=document.getElementById("menuNameSpan");
+   			a.innerHTML="资源名称不能为空";
+   			a.className="red";
+   			return false;
+   		}    
+   	
+ 	  /*if(isNaN(document.getElementById("menu.menuNum").value)){
+ 	    	var b=document.getElementById("menuNumSpan");
+ 		   document.getElementById("menu.menuNum").value="";
+ 		   b.innerHTML="请输入数字";
+ 		   b.className="red";
+ 		  return false;
+ 	   }*/
+
+ 	   var url=document.getElementById("menu.url").value;
+  		var c=document.getElementById("menuUrlSpan");
+  		if(""==url){   			
+  			c.innerHTML="路径不能为空";
+  			c.className="red";
+  			return false;
+  		}else{
+  			alert("成功！");
+			document.getElementById("formId").submit();
+  		}
+   		
+	}
+    

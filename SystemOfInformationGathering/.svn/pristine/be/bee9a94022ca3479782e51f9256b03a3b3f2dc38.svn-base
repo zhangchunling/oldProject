@@ -1,0 +1,353 @@
+package com.zrgk.permission.action;
+
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.struts2.ServletActionContext;
+
+import com.opensymphony.xwork2.ActionSupport;
+import com.zrgk.permission.model.Employee;
+import com.zrgk.permission.model.ExportMenu;
+import com.zrgk.permission.model.Menu;
+import com.zrgk.permission.service.MenuServiceInter;
+import com.zrgk.utils.ExportExcel;
+
+public class MenuAction extends ActionSupport{
+	private MenuServiceInter menuService;
+	private List<Menu> listMenu;
+	private Menu menu;
+	private String resultpath;
+	private Integer msg;
+	private String strValue;	//存页面删除选中的的id拼接字符串
+	private Integer deleteId;
+	private String menuname;//存编辑页面异步时data里传来的参数
+	
+	private List listPage=new ArrayList();//用于存页数
+	private int currentFirstPage;//用当前页计算出的每5页的第一页
+	private int plus5;//之所以要将currentPage加5存变量里,是因jsp页面currentPage直接加5;
+	private int minus5;//之所以要将currentPage加5存变量里,是因jsp页面currentPage直接减5;
+	private int key;
+	//1.插入菜单
+	public String insertMenu(){
+		Menu m=menuService.queryById(menu.getParentId());//查回父id对应的菜单
+		menu.setParentMenu(m.getMenuName());//将父菜单名字赋给当前菜单
+		menuService.insertMenu(menu);//插入
+		key=1;
+	
+		resultpath="menu_queryMenus";
+		return "gotoaction";
+	}
+	
+	//2.在菜单管理时查询所有
+	public String queryMenus(){	
+		if(key==1){
+			menu.setMenuName("");
+			key=0;
+		}
+		//查所有
+		listMenu=menuService.queryMenus(menu);
+		//处理返回
+		if(listMenu.size()==0){
+			menu.setCurrentPage(1);
+			msg=0;
+		}else{			
+			msg=1;
+		}
+		//分页
+		if(menu!=null){
+			//将总的条数据塞进page对象时，就自动算出了总页数。Employee对象继承了Page对象			
+			int nums=menuService.totalSize(menu);
+			menu.setTotalSize(nums);
+			//处理数字的页数
+			listPage.clear();//清空上一次的
+			//将页数放在一个list里，用于在页面循环使用	
+			currentFirstPage=(((menu.getCurrentPage()-1)/5+1)-1)*5+1;
+			//处理点上5页时的传的参		
+			if(currentFirstPage>=(((menu.getTotalPage()-1)/5+1)-1)*5+1){
+				plus5=currentFirstPage;
+				for(int i=currentFirstPage;i<=menu.getTotalPage();i++){			
+					listPage.add(i);
+				}
+			}else{
+				plus5=currentFirstPage+5;
+				for(int i=currentFirstPage;i<currentFirstPage+5;i++){			
+					listPage.add(i);
+				}
+			}
+			//处理下5页时传的参	
+			if(currentFirstPage>5){
+				minus5=currentFirstPage-5;
+			}else{
+				minus5=1;
+			}	
+		}
+		
+		resultpath="/Resource/index.jsp";
+		return "gotojsp";
+	}
+	
+	//3.删除一个
+	public String deleteMenu(){
+	/*	HttpServletRequest request = ServletActionContext.getRequest();
+		String id=request.getParameter("deleteId");*/
+	
+		menu.setMid(deleteId);
+		
+		menuService.deleteMenu(menu);
+		
+		resultpath="menu_queryMenus";
+		return "gotoaction";		
+	}
+	
+	//4.循环删除
+	public String deleteMenuCircle(){
+		String[] strArray=strValue.split(",");
+		for(int i=0;i<strArray.length;i++){
+			int id=Integer.parseInt(strArray[i].trim());
+			menu.setMid(id);
+			menuService.deleteMenu(menu);
+		}
+		resultpath="menu_queryMenus";
+		return "gotoaction";	
+	}
+	
+	//5.添加角色时，要查出所有状不态为启用的菜单，还有就是，如果父菜单被禁用了，则子菜单就不需要了
+	public String queryAllMenu(){
+		listMenu=menuService.queryAllMenu();
+		
+		for(int i=0;i<listMenu.size();i++){
+			Menu m=listMenu.get(i);			
+			//根据父id查回父菜单
+			Menu me=menuService.queryByParentId(m.getParentId());
+			//如果父菜单的状态为0，即为禁用时，移除子菜单
+			if(me!=null&&me.getM_state()==0){
+				listMenu.remove(i);								
+			}
+		}
+		resultpath="/Role/addRole.jsp";
+		return "gotojsp";
+	}
+	//编辑角色时，查回菜单
+	public String editRoleQuery(){
+		listMenu=menuService.queryAllMenu();
+		
+		for(int i=0;i<listMenu.size();i++){
+			Menu m=listMenu.get(i);			
+			//根据父id查回父菜单
+			Menu me=menuService.queryByParentId(m.getParentId());
+			//如果父菜单的状态为0，即为禁用时，移除子菜单
+			if(me!=null&&me.getM_state()==0){
+				listMenu.remove(i);								
+			}
+		}
+		resultpath="/Role/editRole.jsp";
+		return "gotojsp";
+	}
+	
+	//6.添加菜单时查询所有,禁用的查不出
+	public String queryMenuforAdd(){
+		listMenu=menuService.queryAllMenu();
+		
+		resultpath="/Resource/add.jsp";
+		return "gotojsp";
+	}
+	
+	//5.查看新添加的菜单是否重复
+	public String checkMenuAjax() throws IOException{
+		
+		HttpServletResponse response=ServletActionContext.getResponse();
+		response.setContentType("text/html;charset=utf-8");
+		PrintWriter out=response.getWriter();//out打印的字符串可在js里用data得到
+		
+		listMenu=menuService.queryMenus(null);
+		for(Menu emp:listMenu){			
+			if((menu.getMenuName()).equals(emp.getMenuName())){
+				out.print("1");
+				break;
+			}
+		}		
+		 out.close();
+		 return  null;	
+	}
+	
+	//编加人员时，查看登录名是否重复
+	public String checkEditMenuAjax() throws IOException{
+		
+		HttpServletResponse response=ServletActionContext.getResponse();
+		response.setContentType("text/html;charset=utf-8");
+		PrintWriter out=response.getWriter();//out打印的字符串可在js里用data得到
+		listMenu=menuService.queryMenus(null);
+		//去除自身
+		for(int i=0;i<listMenu.size();i++){	
+			if(menu.getMid().equals(listMenu.get(i).getMid())){
+				listMenu.remove(i);
+				break;
+			}
+			
+		}		
+		//判断是否重名
+		for(Menu emp:listMenu){
+			if((emp.getMenuName().equals(menuname))){
+				out.print("1");
+				break;
+			}
+		}		
+		 out.close();
+		 return  null;	
+	}
+	//7.编辑
+	public String editMenu(){
+		//调用按id查询方法	
+		menu=menuService.queryById(menu.getMid());
+		listMenu=menuService.queryMenus(null);		
+		resultpath="/Resource/edit.jsp";
+		return "gotojsp";
+	}	
+	
+	//修改
+	public String updateMenu(){	
+		Menu m=menuService.queryById(menu.getParentId());//查回父id对应的菜单
+		menu.setParentMenu(m.getMenuName());//将父菜单名字赋给当前菜单		
+		menuService.updateMenu(menu);
+		//menu.setMenuName("");
+		key=1;
+		resultpath="menu_queryMenus";
+		return "gotoaction";
+	}
+	
+	//导出Execl
+	public String exportExcel() throws IOException{
+		HttpServletResponse response=ServletActionContext.getResponse();
+		response.setContentType("text/html;charset=utf-8");
+        response.setContentType("octets/stream");
+        response.addHeader("Content-Disposition", "attachment;filename=menu.xls");
+        
+		//创建导出Excel对象，来源工具包
+		ExportExcel<ExportMenu> ex=new ExportExcel<ExportMenu>();
+		 //声明一个数组  里面数据是设置导出的excel头部分（列名）
+		String[] headers = { "菜单编号", "菜单名称", "路径", "父菜单", "是否有效"};
+	    List<ExportMenu> listExcel=new ArrayList<ExportMenu>();
+		if(strValue!=null&&!"".equals(strValue.trim())){
+	    	String[] strArray=strValue.split(",");
+	    	for(int i=0;i<strArray.length;i++){
+	    		Menu m=menuService.queryById(Integer.parseInt(strArray[i].trim()));
+	    		ExportMenu exm=new ExportMenu();
+	    		if(m.getM_state()==1){
+	    			exm.setM_state("有效");
+	    		}
+	    		if(m.getM_state()==0){
+	    			exm.setM_state("无效");
+	    		}
+	    		
+	    		exm.setMenuName(m.getMenuName());
+	    		exm.setMenuNum(m.getMenuNum());
+	    		exm.setParentMenu(m.getParentMenu());
+	    		exm.setUrl(m.getUrl());
+	    		listExcel.add(exm);
+	    	}
+	    }
+		//创建输出流
+		OutputStream outputStream=response.getOutputStream();
+		//导出
+		ex.exportExcel(headers, listExcel, outputStream);
+		outputStream.close();
+		return null;
+	}
+	
+	
+	public Integer getDeleteId() {
+		return deleteId;
+	}
+
+	public void setDeleteId(Integer deleteId) {
+		this.deleteId = deleteId;
+	}
+
+	public MenuServiceInter getMenuService() {
+		return menuService;
+	}
+	public void setMenuService(MenuServiceInter menuService) {
+		this.menuService = menuService;
+	}
+	public List<Menu> getListMenu() {
+		return listMenu;
+	}
+	public void setListMenu(List<Menu> listMenu) {
+		this.listMenu = listMenu;
+	}
+	public Menu getMenu() {
+		return menu;
+	}
+	public void setMenu(Menu menu) {
+		this.menu = menu;
+	}
+	public String getResultpath() {
+		return resultpath;
+	}
+	public void setResultpath(String resultpath) {
+		this.resultpath = resultpath;
+	}
+	public Integer getMsg() {
+		return msg;
+	}
+	public void setMsg(Integer msg) {
+		this.msg = msg;
+	}
+	public List getListPage() {
+		return listPage;
+	}
+	public void setListPage(List listPage) {
+		this.listPage = listPage;
+	}
+	public int getCurrentFirstPage() {
+		return currentFirstPage;
+	}
+	public void setCurrentFirstPage(int currentFirstPage) {
+		this.currentFirstPage = currentFirstPage;
+	}
+	public int getPlus5() {
+		return plus5;
+	}
+	public void setPlus5(int plus5) {
+		this.plus5 = plus5;
+	}
+	public int getMinus5() {
+		return minus5;
+	}
+	public void setMinus5(int minus5) {
+		this.minus5 = minus5;
+	}
+
+	public String getStrValue() {
+		return strValue;
+	}
+
+	public void setStrValue(String strValue) {
+		this.strValue = strValue;
+	}
+
+	public int getKey() {
+		return key;
+	}
+
+	public void setKey(int key) {
+		this.key = key;
+	}
+
+	public String getMenuname() {
+		return menuname;
+	}
+
+	public void setMenuname(String menuname) {
+		this.menuname = menuname;
+	}
+
+
+	
+}

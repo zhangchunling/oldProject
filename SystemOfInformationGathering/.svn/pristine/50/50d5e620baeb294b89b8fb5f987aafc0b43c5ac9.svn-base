@@ -1,0 +1,303 @@
+package com.zrgk.permission.action;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import com.opensymphony.xwork2.ActionSupport;
+import com.zrgk.permission.model.Role;
+import com.zrgk.permission.model.Role_menu;
+import com.zrgk.permission.service.RoleServiceInter;
+
+public class RoleAction extends ActionSupport{
+	private RoleServiceInter roleService;
+	private List<Role> listRole;
+	private Role role;
+	private String resultpath;
+	private Integer roleMsg;
+	private Role_menu roleMenu;	//中间表对象
+	private String strMenu;		//存的菜单拼接字符串
+	private Integer editRid;	//编辑时传的id
+	private Integer RoleId;		//点右边删除时传的id
+	private String roleStrValue;//存点删除选中的拼接id
+	
+	private List listPage=new ArrayList();//用于存页数
+	private int currentFirstPage;//用当前页计算出的每5页的第一页
+	private int plus5;//之所以要将currentPage加5存变量里,是因jsp页面currentPage直接加5;
+	private int minus5;//之所以要将currentPage加5存变量里,是因jsp页面currentPage直接减5;
+	
+	private Integer rolekey=0;//标记
+	
+	//1.添加人员时，需要走这个方法将角色查出来
+	public String queryAllRole(){
+		listRole=roleService.queryAllRole();
+		resultpath="/User/addUser.jsp";
+		return "gotojsp";		 
+	 }
+	
+	//2.编辑人员时，也需要走这个方法将角色查出来
+	 public String editQueryAll(){
+		 listRole=roleService.queryAllRole();
+		 resultpath="/User/editUser.jsp";
+		return "gotojsp";	 
+	 }
+	 
+	 //3.角色管理时查询所有
+	 public String queryRoles(){
+		 if(rolekey==1){
+			 role.setRoleName("");
+			 rolekey=0;
+		 }
+		//查所有
+		 listRole=roleService.queryRoles(role); 	
+			
+		//分页
+		if(role!=null){
+			//判断是否有查回数据
+			if(listRole.size()==0){
+				//role.setCurrentPage(1);
+				roleMsg=0;
+			}else{			
+				roleMsg=1;
+			}
+			//将总的条数据塞进page对象时，就自动算出了总页数。Employee对象继承了Page对象			
+			int nums=roleService.totalSize(role);
+			role.setTotalSize(nums);
+			//处理数字的页数
+			listPage.clear();//清空上一次的
+			//将页数放在一个list里，用于在页面循环使用	
+			currentFirstPage=(((role.getCurrentPage()-1)/5+1)-1)*5+1;
+			//处理点上5页时的传的参		
+			if(currentFirstPage>=(((role.getTotalPage()-1)/5+1)-1)*5+1){
+				plus5=currentFirstPage;
+				for(int i=currentFirstPage;i<=role.getTotalPage();i++){			
+					listPage.add(i);
+				}
+			}else{
+				plus5=currentFirstPage+5;
+				for(int i=currentFirstPage;i<currentFirstPage+5;i++){			
+					listPage.add(i);
+				}
+			}
+			//处理下5页时传的参	
+			if(currentFirstPage>5){
+				minus5=currentFirstPage-5;
+			}else{
+				minus5=1;
+			}	
+		}
+		/*	
+		//根据employee查回总的数条数
+		int nums=roleService.totalSize(role);
+		//将总的条数据塞进page对象时，就自动算出了总页数。Employee对象继承了Page对象
+		role.setTotalSize(nums);			
+		//查询所有员工
+		 listRole=roleService.queryRoles(role);
+		
+		//处理数字的页数
+		listPage.clear();//清空上一次的
+		//将页数放在一个list里，用于在页面循环使用	
+		currentFirstPage=(((role.getCurrentPage()-1)/5+1)-1)*5+1;
+		//处理点上5页时的传的参		
+		if(currentFirstPage>=(((role.getTotalPage()-1)/5+1)-1)*5+1){
+			plus5=currentFirstPage;
+			for(int i=currentFirstPage;i<=role.getTotalPage();i++){			
+				listPage.add(i);
+			}
+		}else{
+			plus5=currentFirstPage+5;
+			for(int i=currentFirstPage;i<currentFirstPage+5;i++){			
+				listPage.add(i);
+			}
+		}
+		//处理下5页时传的参	
+		if(currentFirstPage>5){
+			minus5=currentFirstPage-5;
+		}else{
+			minus5=1;
+		}*/
+		
+		resultpath="/Role/index.jsp";
+		return "gotojsp";
+	 }
+	
+	 //插入角色
+	public String insertRole(){
+		//插入角色表
+		role.setStrRole(strMenu);
+		roleService.insertRole(role);	
+		//得到当前角色的最大Id
+		int maxId=roleService.getMaxId();
+		//插入中间表
+		String[] menuArray=strMenu.split(",");
+		
+		for(int i=0;i<menuArray.length;i++){
+			//得到菜单的主键
+			int id=Integer.parseInt(menuArray[i].trim());
+			//赋值
+			Role_menu rm=new Role_menu();
+			rm.setMid(id);
+			rm.setRid(maxId);
+			//插入角色-菜单中间表
+			roleService.insertRole_menu(rm);
+		}
+		return "gotoRoleIndex";
+	}
+
+	//编辑：先要查回菜单
+	public String editRole(){
+		//根据Id查回需要回写的这条信息
+		role=roleService.queryRoleById(editRid);
+		return "gotoMenu";
+	}
+	
+	//根据Id删除
+	public String deleteById(){
+		
+		//按id删除角色表数据
+		roleService.delelteRoleById(RoleId);
+		//用当前的id去删除 中间表 的对应关系
+		roleService.deleteRole_menu(RoleId);
+		return "gotoRoleIndex";
+	}
+	
+	//循环删除选中项
+	public String circleDeleteRole(){
+		String[] strs = roleStrValue.split(",");
+		for(int i=0;i<strs.length;i++){			
+			int did=Integer.parseInt(strs[i].trim());
+			roleService.delelteRoleById(did);//删除人员表
+			roleService.deleteRole_menu(did);//删除中间表
+		}
+		return "gotoRoleIndex";
+	}
+	
+	//更新角色：【同时也得更新 角色—菜单 中间表：先删除再插入】
+	public String updateRole(){
+		//将编辑保存时的菜单id拼接字符串赋进角色里
+		role.setStrRole(strMenu);
+		//更新角色
+		roleService.updateRole(role);
+		//更新中间表，由于这里不用级联，所以只能先根据id删除，然后再插入中间表
+		roleService.deleteRole_menu(editRid);
+		//再插入
+		String[] rmArray=strMenu.split(",");
+		for(int i=0;i<rmArray.length;i++){
+			int menuId=Integer.parseInt(rmArray[i].trim());//页面传来的拼接字符串拆分有空格
+			Role_menu rolemenu=new Role_menu();
+			rolemenu.setRid(editRid);
+			rolemenu.setMid(menuId);
+			roleService.insertRole_menu(rolemenu);
+		}
+		
+		return "gotoRoleIndex";
+	}
+	
+	public Role_menu getRoleMenu() {
+		return roleMenu;
+	}
+	public void setRoleMenu(Role_menu roleMenu) {
+		this.roleMenu = roleMenu;
+	}
+	public String getStrRole() {
+		return strMenu;
+	}
+	
+	public Integer getEditRid() {
+		return editRid;
+	}
+	public void setEditRid(Integer editRid) {
+		this.editRid = editRid;
+	}
+	public void setStrRole(String strRole) {
+		this.strMenu = strRole;
+	}
+	public String getStrMenu() {
+		return strMenu;
+	}
+	public void setStrMenu(String strMenu) {
+		this.strMenu = strMenu;
+	}
+	
+	public Integer getRolekey() {
+		return rolekey;
+	}
+	public void setRolekey(Integer rolekey) {
+		this.rolekey = rolekey;
+	}
+	public Integer getRoleId() {
+		return RoleId;
+	}
+	public void setRoleId(Integer roleId) {
+		RoleId = roleId;
+	}
+	public List getListPage() {
+		return listPage;
+	}
+	public void setListPage(List listPage) {
+		this.listPage = listPage;
+	}
+	public int getCurrentFirstPage() {
+		return currentFirstPage;
+	}
+	public void setCurrentFirstPage(int currentFirstPage) {
+		this.currentFirstPage = currentFirstPage;
+	}
+	public int getPlus5() {
+		return plus5;
+	}
+	public void setPlus5(int plus5) {
+		this.plus5 = plus5;
+	}
+	public int getMinus5() {
+		return minus5;
+	}
+	public void setMinus5(int minus5) {
+		this.minus5 = minus5;
+	}
+	public RoleServiceInter getRoleService() {
+		return roleService;
+	}
+
+	public void setRoleService(RoleServiceInter roleService) {
+		this.roleService = roleService;
+	}
+
+	public List<Role> getListRole() {
+		return listRole;
+	}
+
+	public void setListRole(List<Role> listRole) {
+		this.listRole = listRole;
+	}
+
+	public String getResultpath() {
+		return resultpath;
+	}
+
+	public void setResultpath(String resultpath) {
+		this.resultpath = resultpath;
+	}
+	
+	
+	public Integer getRoleMsg() {
+		return roleMsg;
+	}
+
+	public void setRoleMsg(Integer roleMsg) {
+		this.roleMsg = roleMsg;
+	}
+
+	public Role getRole() {
+		return role;
+	}
+	public void setRole(Role role) {
+		this.role = role;
+	}
+	public String getRoleStrValue() {
+		return roleStrValue;
+	}
+	public void setRoleStrValue(String roleStrValue) {
+		this.roleStrValue = roleStrValue;
+	}
+	
+}

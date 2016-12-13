@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+
+	<!-- 
+	private Integer pf_id;
+	private String pf_author;
+	private String pf_name;
+	private String pf_type;
+	private String pf_style;
+	private Clob pf_content;
+	private Integer pf_mu_id;
+	private Integer pf_u_id; 
+	-->
+	
+    <class name="com.zrgk.manu.bean.PageFile" table="pagefile">
+    
+        <id name="pf_id" type="java.lang.Integer">
+            <column name="pf_id" /> 
+            <generator class="increment" />
+        </id>
+        <property name="pf_author" type="java.lang.String" >
+            <column name="pf_author" />
+        </property>
+        <!-- ****** -->
+        
+         <property name="pf_name" type="java.lang.String" >
+            <column name="pf_name" />
+        </property>
+         <property name="pf_type" type="java.lang.String" >
+            <column name="pf_type" />
+        </property>
+         <property name="pf_style" type="java.lang.String" >
+            <column name="pf_style" />
+        </property>
+         <property name="pf_content" type="java.sql.Clob" >
+            <column name="pf_content" />
+        </property>
+         <property name="pf_mu_id" type="java.lang.Integer" >
+            <column name="pf_mu_id" />
+        </property>
+         <property name="pf_u_id" type="java.lang.Integer" >
+            <column name="pf_u_id" />
+        </property>
+        <property name="pf_createtime" type="java.lang.String" >
+            <column name="pf_createtime" />
+        </property>
+        
+        <property name="pf_state" type="java.lang.Integer" >
+            <column name="pf_state" />
+        </property>
+       
+        </class>    
+</hibernate-mapping>

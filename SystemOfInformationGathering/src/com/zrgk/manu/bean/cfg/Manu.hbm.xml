@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+
+	<!-- 
+	private Integer mid;
+	private String mname;
+	private String mbknum;
+	private String minfo;
+	private String mendTime;
+	private String mstartTime;
+	private Integer mstate;
+	private String mmaster;
+	-->
+	
+    <class name="com.zrgk.manu.bean.Manu" table="manu">
+    
+        <id name="mid" type="java.lang.Integer">
+            <column name="mid" /> 
+            <generator class="increment" />
+        </id>
+        <property name="mname" type="java.lang.String" >
+            <column name="mname" />
+        </property>
+        <!-- ****** -->
+        
+         <property name="mbknum" type="java.lang.Integer" >
+            <column name="mbknum" />
+        </property>
+         <property name="minfo" type="java.lang.String" >
+            <column name="minfo" />
+        </property>
+         <property name="mendTime" type="java.lang.String" >
+            <column name="mendtime" />
+        </property>
+         <property name="mstartTime" type="java.lang.String" >
+            <column name="mstarttime" />
+        </property>
+         <property name="mstate" type="java.lang.Integer" >
+            <column name="mstate" />
+        </property>
+         <property name="mmaster" type="java.lang.String" >
+            <column name="mmaster" />
+        </property>
+       
+        </class>    
+</hibernate-mapping>

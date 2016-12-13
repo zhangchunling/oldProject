@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+
+	<!-- 
+	private Integer muid;//关联表主键
+	private Integer mid;//manu主键
+	private Integer mmstate;//用户对约稿的接收状态
+	private Integer uuid;//用户主键
+	-->
+	
+    <class name="com.zrgk.manu.bean.Manu_User" table="Manu_User">
+    
+        <id name="muid" type="java.lang.Integer">
+            <column name="muid" /> 
+            <generator class="increment" />
+        </id>
+        
+         <property name="mid" type="java.lang.Integer" >
+            <column name="mid" />
+        </property>
+         
+         <property name="umstate" type="java.lang.Integer" >
+            <column name="umstate" />
+        </property>
+         
+         <property name="uuid" type="java.lang.Integer" >
+            <column name="uuid" />
+        </property>
+         <property name="pfid" type="java.lang.Integer" >
+            <column name="pfid" />
+        </property>
+         
+         
+       
+        </class>    
+</hibernate-mapping>
