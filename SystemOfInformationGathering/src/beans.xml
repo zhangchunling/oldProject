@@ -12,7 +12,7 @@
        http://www.springframework.org/schema/aop/spring-aop-2.0.xsd">
 	
        
-  <!--=================================================================  -->     
+  <!--=================================================================peter  -->     
 	<import resource="pemission-beans.xml"/>
 	<import resource="email-beans.xml" />
 	<import resource="manu-beans.xml"/>
